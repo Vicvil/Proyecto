@@ -36,31 +36,28 @@ EL RETO MÁS IMPORTANTE FUERON LOS CÁLCULOS MANUALES QUE SE DEBÍAN REALIZAR PO
 
 **APLICACIÓN PRÁCTICA:** EL MODELO DESARROLLADO PUEDE APLICARSE EN ENTORNOS DE ATENCIÓN MÉDICA PARA IDENTIFICAR A LOS PACIENTES CON MAYOR RIESGO DE INCUMPLIMIENTO DE PAGO Y TOMAR MEDIDAS PROACTIVAS PARA ABORDAR SUS NECESIDADES FINANCIERAS. ESTO PUEDE AYUDAR A REDUCIR LOS COSTOS ASOCIADOS CON LAS CUENTAS INCOBRABLES Y MEJORAR LA EFICIENCIA EN LA GESTIÓN DE INGRESOS DE LAS INSTITUCIONES MÉDICAS.
 
-SE UTILIZÓ LA BASE DE DATOS ANEXA:
+SE UTILIZÓ LA BASE DE DATOS ANEXA.
+
+PARA REALIZAR EL PREPROSESAMIENTO DE LOS DATOS UTILIZAMOS EL SIGUIENTE CÓDIGO
 
 
-
-
-
-PARA REALIZAR EL PREPROSESAMIENTO DE LOS DATOS Y EL ANÁLISIS EXPLORATORIO SE UTILIZÓ EL SIGUIENTE CÓDIGO:
-
-#%%
 # 1. Importa las paqueterias
-import pandas as pd
-import numpy as np
-import sys
-import io
-#%%
+        import pandas as pd
+        import numpy as np
+        import sys
+        import io
+
 # 2. Importamos el conjunto de datos
-df= pd.read_csv("datasets/propensity_to_pay_healthcare.csv")
+        df= pd.read_csv("datasets/propensity_to_pay_healthcare.csv")
+
 # 2.1 Vemos las dimensiones del dataframe
-rows = df.shape[0]
-cols = df.shape[1]
-print(f"El dataframe tiene {rows} filas y {cols} columnas")
-#%%
+        rows = df.shape[0]
+        cols = df.shape[1]
+        print(f"El dataframe tiene {rows} filas y {cols} columnas")
+
 # 2.2 Reporte de las columnas
-df.info()
-#%%
+        df.info()
+
 # Crear un objeto StringIO
 buffer = io.StringIO()
 
@@ -170,6 +167,305 @@ with open('resultados_preprocesamiento/dataframe_summary_post.txt', 'w') as f:
     
 #%% Guardamos el resultado
 df_filtrado.to_csv("resultados_preprocesamiento/train_dataset.csv")
+
+PARA REALIZAR EL ANALISIS GRÁFICO UTILIZAMOS EL SIGUIENTE CÓDIGO:
+
+#%% Importación de bibliotecas
+import os
+import sys
+import io
+import glob
+"""
+# os: Proporciona una forma de utilizar funcionalidades dependientes del sistema operativo, 
+  como leer o escribir en el sistema de archivos.
+
+# sys: Proporciona acceso a algunas variables y funciones que interactúan fuertemente 
+  con el intérprete de Python, como sys.argv para recibir argumentos de la línea de comandos.
+
+# io: Proporciona herramientas para trabajar con flujos de entrada y salida, tanto para archivos
+  como para datos en memoria.
+
+# glob: Proporciona una forma de encontrar todos los nombres de ruta que coinciden con un 
+  patrón específico, útil para listar archivos con nombres que sigan un patrón.
+"""
+import pandas as pd
+"""
+# pandas: Biblioteca esencial para manipulación y análisis de datos, proporciona estructuras 
+  de datos como DataFrame para trabajar con datos tabulares de manera eficiente.
+"""
+import matplotlib.pyplot as plt
+"""
+# matplotlib.pyplot: Biblioteca para crear visualizaciones estáticas,
+ animadas e interactivas en Python. plt es una interfaz similar a MATLAB 
+ para facilitar la creación de gráficos.
+"""
+import seaborn as sns
+"""
+# seaborn: Biblioteca basada en matplotlib que proporciona una interfaz de alto nivel 
+  para dibujar gráficos estadísticos atractivos y con estilo.
+"""
+import numpy as np
+"""
+# numpy: Biblioteca fundamental para el cálculo científico en Python. 
+ Proporciona soporte para arrays y matrices grandes, junto con una colección 
+ de funciones matemáticas de alto nivel para operar con estos arrays.
+"""
+from sklearn.decomposition import PCA
+"""
+# sklearn.decomposition.PCA: Implementa el análisis de componentes principales (PCA).
+"""
+from sklearn.preprocessing import StandardScaler
+"""
+# sklearn.preprocessing.StandardScaler: Estandariza las características eliminando la media y escalando 
+a la varianza unitaria.
+"""
+
+#%% Importación del archivo
+
+# Buscar el archivo CSV en la carpeta "datasets"
+csv_files = glob.glob("datasets/*.csv")
+
+# Verificar que hay exactamente un archivo CSV
+if len(csv_files) == 1:
+    df = pd.read_csv(csv_files[0])
+    print("Archivo CSV cargado exitosamente.")
+else:
+    print("Error: No se encontró un archivo CSV único en la carpeta 'datasets'.")
+
+#df.drop(columns="Unnamed: 32", inplace=True)
+
+#%% Preparación de carpetas para guardar imágenes
+
+# Crear las carpetas si no existen
+if not os.path.exists('imagenes'):
+    os.makedirs('imagenes')
+if not os.path.exists('imagenes/var_categoricas'):
+    os.makedirs('imagenes/var_categoricas')
+if not os.path.exists('imagenes/var_numericas'):
+    os.makedirs('imagenes/var_numericas')
+
+#%% Separar columnas numéricas y categóricas
+columnas_numericas = df.select_dtypes(include=['number']).columns
+columnas_categoricas = df.select_dtypes(include=['object', 'category']).columns
+
+#%% Configuración de matplotlib
+
+%matplotlib inline
+
+# Crear una figura de ejemplo
+plt.figure(figsize=(8, 8))
+plt.plot([1, 2, 3, 4], [10, 20, 25, 30])
+plt.title("Gráfico de ejemplo")
+plt.xlabel("Eje X")
+plt.ylabel("Eje Y")
+plt.show()
+
+%matplotlib notebook
+df[columnas_numericas[1]].value_counts().plot(kind='hist')
+plt.title(columnas_numericas[1])
+
+#%% Configuración de tamaño de gráficos
+
+# Tamaño en píxeles
+width_px = 1200
+height_px = 1200
+
+# DPI
+dpi = 100
+
+# Convertir a pulgadas
+width_inch = width_px / dpi
+height_inch = height_px / dpi
+
+# Crear una figura con el tamaño calculado en pulgadas
+plt.figure(figsize=(width_inch, height_inch), dpi=dpi)
+plt.plot([1, 2, 3, 4], [10, 20, 25, 30])
+plt.title("Gráfico de ejemplo")
+plt.xlabel("Eje X")
+plt.ylabel("Eje Y")
+plt.savefig('mi_figura.png')
+plt.show()
+
+#%% Crear histogramas y gráficos de barras
+
+%matplotlib inline
+for col in columnas_numericas:
+    plt.figure(figsize=(10, 6))
+    df[col].dropna().value_counts().plot(kind='hist', edgecolor='k')
+    plt.title(f'Histograma de {col}')
+    plt.xlabel(col)
+    plt.ylabel('Frecuencia')
+    plt.tight_layout()
+    plt.savefig(f'imagenes/var_numericas/histograma_{col}.png')
+    plt.close()
+
+for col in columnas_categoricas:
+    plt.figure(figsize=(10, 6))
+    df[col].dropna().value_counts().plot(kind='bar', edgecolor='k')
+    plt.title(f'Gráfico de barras de {col}')
+    plt.xlabel(col)
+    plt.ylabel('Frecuencia')
+    plt.tight_layout()
+    plt.savefig(f'imagenes/var_categoricas/barra_{col}.png')
+    plt.close()
+
+#%% Gráfico de valores NA
+
+cuenta_faltantes = df.isnull().sum()
+total_valores = df.isnull().count()
+porcentaje_faltantes = round((cuenta_faltantes / total_valores) * 100, 2)
+
+faltantes_df = pd.DataFrame({'cuenta': cuenta_faltantes, 'porcentaje': porcentaje_faltantes})
+
+# Crear la carpeta "resultados_analisis_estadistico" si no existe
+if not os.path.exists('resultados_analisis_estadistico'):
+    os.makedirs('resultados_analisis_estadistico')
+
+# Guardar resultados de valores NA
+buffer = io.StringIO()
+sys.stdout = buffer
+print(faltantes_df)
+sys.stdout = sys.__stdout__
+contenido = buffer.getvalue()
+with open('resultados_analisis_estadistico/porcentaje_NA_por_columnas.txt', 'w') as archivo:
+    archivo.write(contenido)
+buffer.close()
+
+#%% Gráfico de barras horizontal para el porcentaje de valores faltantes
+
+%matplotlib notebook
+if not os.path.exists('imagenes/grafica_na'):
+    os.makedirs('imagenes/grafica_na')
+
+barchart = faltantes_df.plot.barh(y='porcentaje')
+plt.yticks(fontsize=12)
+for indice, porcentaje in enumerate(porcentaje_faltantes):
+    barchart.text(porcentaje + 4, indice, str(porcentaje) + "%", ha='right', va='center')
+
+plt.title("Porcentaje de valores NA desglosado por columnas", fontsize=18)
+plt.xlabel("Porcentaje", fontsize=12)
+plt.ylabel("Columnas", fontsize=12)
+plt.savefig('imagenes/grafica_na/grafico_valores_faltantes.png')
+
+#%% Comparaciones con Seaborn
+
+df_num = df[columnas_numericas]
+df_num.drop(columns="ID Paciente", inplace=True)
+
+if not os.path.exists('imagenes/pairplot'):
+    os.makedirs('imagenes/pairplot')
+
+# Comparación numérica vs. numérica
+sns.pairplot(df_num)
+plt.savefig('imagenes/pairplot/pairplot_numerical_vs_numerical.png')
+plt.close()
+
+#%% Convertir columnas numéricas a categóricas
+
+df_categorico = df.drop(df.index).copy()
+for col in columnas_numericas:
+    df_categorico[f'{col}'] = pd.cut(df[col], bins=4, labels=['Bajo', 'Medio', 'Alto', 'Muy Alto'])
+
+df_categorico["Propensión a Pagar"] = df["Propensión a Pagar"].copy()
+
+if not os.path.exists('imagenes/count_plot'):
+    os.makedirs('imagenes/count_plot')
+
+sns.countplot(data=df_categorico, 
+              x="Ingresos Mensuales", 
+              hue='Propensión a Pagar')
+plt.savefig('imagenes/count_plot/countplot_categorical_vs_categorical.png')
+plt.close()
+
+#%% Comparación categórica vs. numérica
+
+%matplotlib inline
+sns.set(style="whitegrid")
+if not os.path.exists('imagenes/boxplot'):
+    os.makedirs('imagenes/boxplot')
+
+for columna in columnas_numericas:
+    plt.figure(figsize=(10, 6))
+    sns.boxplot(data=df, x="Propensión a Pagar", y=columna)
+    plt.title(f'Boxplot de "{columna}" para cada valor de "Propensión a Pagar"')
+    plt.xlabel('Propensión a Pagar')
+    plt.ylabel(columna)
+    plt.savefig(f'imagenes/boxplot/boxplot_{columna}_vs_Propensión a Pagar.png')
+    plt.close()
+
+#%% Comparación numérica vs. numérica con hue categórico
+
+df_num["Propensión a Pagar"] = df["Propensión a Pagar"].copy()
+
+%matplotlib inline
+sns.set(style="whitegrid")
+sns.pairplot(df_num, hue='Propensión a Pagar')
+plt.savefig('imagenes/pairplot/pairplot_numerical_with_hue.png')
+plt.close()
+
+#%% Heatmap de las columnas numéricas
+
+if not os.path.exists('imagenes/heatmap'):
+    os.makedirs('imagenes/heatmap')
+
+df_num.drop(columns="Propensión a Pagar",inplace=True)
+
+correlation_matrix = df_num.corr()
+sns.set(style="white")
+
+plt.figure(figsize=(12, 8))
+heatmap = sns.heatmap(correlation_matrix, cmap='coolwarm', linewidths=.5)
+plt.title('Heatmap de Correlación entre Columnas Numéricas')
+plt.savefig('imagenes/heatmap/heatmap_correlacion_numericas.png')
+plt.close()
+
+#%% Análisis de Componentes Principales (PCA)
+if not os.path.exists('imagenes/PCA'):
+    os.makedirs('imagenes/PCA')
+    
+scaler = StandardScaler()
+df_num_scaled = scaler.fit_transform(df_num)
+
+pca = PCA(n_components=2)
+pca_result = pca.fit_transform(df_num_scaled)
+
+pca_df = pd.DataFrame(data=pca_result, columns=['PC1', 'PC2'])
+pca_df['Propensión a Pagar'] = df['Propensión a Pagar']
+
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='PC1', 
+                y='PC2', 
+                hue='Propensión a Pagar', 
+                data=pca_df,
+                palette='viridis')
+plt.title('PCA de Columnas Numéricas')
+plt.xlabel('Componente Principal 1')
+plt.ylabel('Componente Principal 2')
+plt.savefig('imagenes/PCA/pca_columnas_numericas.png')
+plt.close()
+
+
+#%%
+
+# Obtener los pesos de los dos primeros componentes
+pca_loadings = pca.components_
+
+# Crear un DataFrame para los pesos
+pca_loadings_df = pd.DataFrame(pca_loadings.T, 
+                               columns=['PC1', 'PC2'], 
+                               index=columnas_numericas.drop("ID Paciente"))
+# Añadir una columna con el nombre de las variables
+pca_loadings_df.reset_index(inplace=True)
+pca_loadings_df.rename(columns={'index': 'Variable'}, inplace=True)
+
+
+pca_loadings_df.to_csv('imagenes/PCA/pesos_pca.csv', index=False)
+#%%
+
+
+
+
+**CONCLUSIONES**
 
 
 
